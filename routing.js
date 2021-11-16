@@ -18,7 +18,6 @@ function router(app) {
   });
 
   app.put("/users/:id", (req, res) => {
-    console.log(req.body);
     res.send({
       data: Users[req.params.id],
       message: "User updated seccessfully",

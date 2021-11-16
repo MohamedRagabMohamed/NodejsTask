@@ -1,29 +1,21 @@
-const { Users } = require("./user");
+const {
+  GetAllUsers,
+  GetUserByID,
+  UpdateUser,
+  StoreUser,
+  DeleteUser,
+} = require("./userController");
 
 function router(app) {
-  app.get("/users", (req, res) => {
-    res.send({
-      data: Users,
-      message: "Users found seccessfully",
-      error: null,
-    });
-  });
+  app.get("/users", GetAllUsers);
 
-  app.get("/users/:id", (req, res) => {
-    res.send({
-      data: Users[req.params.id],
-      message: "User found seccessfully",
-      error: null,
-    });
-  });
+  app.get("/users/:id", GetUserByID);
 
-  app.put("/users/:id", (req, res) => {
-    res.send({
-      data: Users[req.params.id],
-      message: "User updated seccessfully",
-      error: null,
-    });
-  });
+  app.put("/users/:id", UpdateUser);
+
+  app.post("/users", StoreUser);
+
+  app.delete("/users/:id", DeleteUser);
 }
 
 module.exports = { router };

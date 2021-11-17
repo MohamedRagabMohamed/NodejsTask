@@ -1,11 +1,10 @@
-const { Users } = require("./user");
-const { validate } = require("./helper");
+const { Users, Schema } = require("./model");
 
 function GetAllUsers(req, res) {
   var users = [...Users];
   res.send({
     data: users,
-    message: "Users found seccessfully",
+    message: "Users found successfully",
     error: null,
   });
 }
@@ -21,34 +20,36 @@ function GetUserByID(req, res) {
   }
   res.send({
     data: Users.get(id),
-    message: "User found seccessfully",
+    message: "User found successfully",
     error: null,
   });
 }
 
 function UpdateUser(req, res) {
-  if (!validate(req.body)) {
-    res.send({
+  result = Schema.validate(req.body);
+  if (result.error != null) {
+    res.status(400).send({
       data: "",
       message: "Insert valid user data",
-      error: null,
+      error: result.error.details[0].message,
     });
     return;
   }
   Users.set(Number(req.params.id), req.body);
   res.send({
     data: Users.get(Number(req.params.id)),
-    message: "User updated seccessfully",
+    message: "User updated successfully",
     error: null,
   });
 }
 
 function StoreUser(req, res) {
-  if (!validate(req.body)) {
-    res.send({
+  result = Schema.validate(req.body);
+  if (result.error != null) {
+    res.status(400).send({
       data: "",
       message: "Insert valid user data",
-      error: null,
+      error: result.error.details[0].message,
     });
     return;
   }
@@ -60,7 +61,7 @@ function StoreUser(req, res) {
 
   res.send({
     data: Users.get(id),
-    message: "User added seccessfully",
+    message: "User added successfully",
     error: null,
   });
 }
@@ -79,7 +80,7 @@ function DeleteUser(req, res) {
   Users.delete(id);
   res.send({
     data: user,
-    message: "User deleted seccessfully",
+    message: "User deleted successfully",
     error: null,
   });
 }

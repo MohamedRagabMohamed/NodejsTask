@@ -4,9 +4,9 @@ const {
   UpdateUser,
   StoreUser,
   DeleteUser,
-} = require("./userController");
+} = require("./controller");
 
-function router(app) {
+function userRouter(app) {
   app.get("/users", GetAllUsers);
 
   app.get("/users/:id", GetUserByID);
@@ -18,4 +18,4 @@ function router(app) {
   app.delete("/users/:id", DeleteUser);
 }
 
-module.exports = { router };
+module.exports = { userRouter };

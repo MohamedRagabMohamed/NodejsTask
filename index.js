@@ -1,15 +1,15 @@
 require("dotenv").config();
-const seeder = require("./seeder");
+require("./data/database");
 
 const express = require("express");
-const { router } = require("./routing");
+const { userRouter } = require("./Users/route");
+const { courseRouter } = require("./Courses/route");
 const app = express();
 
 app.use(express.json());
 
-seeder.userSeeder();
-
-router(app);
+userRouter(app);
+courseRouter(app);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));

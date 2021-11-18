@@ -20,7 +20,7 @@ async function connectionTest() {
   }
 }
 async function migrationDB() {
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
 }
 
 connectionTest();

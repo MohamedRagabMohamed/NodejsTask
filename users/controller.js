@@ -1,16 +1,17 @@
-const { Users, Schema } = require("./model");
+const { User } = require("./model");
 
-function GetAllUsers(req, res) {
-  var users = [...Users];
+async function GetAllUsers(req, res) {
+  var users = await User.findAll();
   res.send({
     data: users,
     message: "Users found successfully",
     error: null,
   });
 }
-function GetUserByID(req, res) {
+async function GetUserByID(req, res) {
   id = Number(req.params.id);
-  if (!Users.has(id)) {
+  user = await User.findByPk(id);
+  if (user === null) {
     res.send({
       data: "",
       message: "User not found",
@@ -19,56 +20,16 @@ function GetUserByID(req, res) {
     return;
   }
   res.send({
-    data: Users.get(id),
+    data: user,
     message: "User found successfully",
     error: null,
   });
 }
 
-function UpdateUser(req, res) {
-  result = Schema.validate(req.body);
-  if (result.error != null) {
-    res.status(400).send({
-      data: "",
-      message: "Insert valid user data",
-      error: result.error.details[0].message,
-    });
-    return;
-  }
-  Users.set(Number(req.params.id), req.body);
-  res.send({
-    data: Users.get(Number(req.params.id)),
-    message: "User updated successfully",
-    error: null,
-  });
-}
-
-function StoreUser(req, res) {
-  result = Schema.validate(req.body);
-  if (result.error != null) {
-    res.status(400).send({
-      data: "",
-      message: "Insert valid user data",
-      error: result.error.details[0].message,
-    });
-    return;
-  }
-  id = Users.size + 1;
-  if (Users.has(id)) {
-    id++;
-  }
-  Users.set(id, req.body);
-
-  res.send({
-    data: Users.get(id),
-    message: "User added successfully",
-    error: null,
-  });
-}
-
-function DeleteUser(req, res) {
+async function UpdateUser(req, res) {
   id = Number(req.params.id);
-  if (!Users.has(id)) {
+  user = await User.findByPk(id);
+  if (user === null) {
     res.send({
       data: "",
       message: "User not found",
@@ -76,11 +37,81 @@ function DeleteUser(req, res) {
     });
     return;
   }
-  user = Users.get(id);
-  Users.delete(id);
+  await User.update(
+    {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      phoneNumber: req.body.phoneNumber,
+    },
+    { where: { id: req.params.id } }
+  ).catch((error) => {
+    res.send({
+      data: req.body,
+      message: "User cannot updated",
+      error: error.errors[0].message,
+    });
+  });
+  user = await User.findByPk(id);
   res.send({
     data: user,
-    message: "User deleted successfully",
+    message: "User updated successfully",
+    error: null,
+  });
+}
+
+async function StoreUser(req, res) {
+  user = await User.findOne({ where: { email: req.body.email } });
+  if (user !== null) {
+    res.status(400).send({
+      data: user,
+      message: "User data added before",
+      error: null,
+    });
+    return;
+  }
+  user = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    phoneNumber: req.body.phoneNumber,
+  }).catch((error) => {
+    res.send({
+      data: "",
+      message: "User cannot added",
+      error: error.errors[0].message,
+    });
+  });
+  res.send({
+    data: user,
+    message: "User added successfully",
+    error: null,
+  });
+}
+
+async function DeleteUser(req, res) {
+  id = Number(req.params.id);
+  user = await User.findByPk(id);
+  if (user === null) {
+    res.send({
+      data: "",
+      message: "User not found",
+      error: null,
+    });
+    return;
+  }
+  await User.destroy({ where: { id: Number(req.params.id) } }).catch(
+    (error) => {
+      res.send({
+        data: "",
+        message: "User cannot deleted",
+        error: error.errors[0].message,
+      });
+    }
+  );
+  res.send({
+    data: user,
+    message: "user deleted successfully",
     error: null,
   });
 }
